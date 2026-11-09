@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExpenseApp.Application\ExpenseApp.Application.csproj" />
+    <ProjectReference Include="..\ExpenseApp.Infrastructure\ExpenseApp.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

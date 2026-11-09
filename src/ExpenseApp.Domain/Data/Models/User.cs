@@ -1,6 +1,6 @@
 using System;
 
-namespace ExpenseApp.Api.Data.Models;
+namespace ExpenseApp.Domain.Data.Models;
 
 public class User : BaseEntity
 {
