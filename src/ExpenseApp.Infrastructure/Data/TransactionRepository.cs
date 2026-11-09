@@ -31,6 +31,11 @@ public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRep
         if (transactionFromDb is null)
             return null;
 
+        transactionFromDb.Amount = transaction.Amount;
+        transactionFromDb.Category = transaction.Category;
+        transactionFromDb.Description = transaction.Description;
+        transactionFromDb.UpdateAt = DateTime.UtcNow;
+
         dbContext.Transactions.Update(transactionFromDb);
         return transactionFromDb;
     }
@@ -42,7 +47,7 @@ public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRep
             return null;
 
         dbContext.Transactions.Remove(transaction);
-        
+
         return transaction;
     }
 }

@@ -1,3 +1,4 @@
+using ExpenseApp.Application;
 using ExpenseApp.Infrastructure;
 using ExpenseApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ public class Program
 
         builder.Services.AddControllers();
 
+        builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -31,8 +33,9 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseAuthorization();
+        app.UseCustomExceptionHandler();
 
+        app.UseAuthorization();
 
         app.MapControllers();
 

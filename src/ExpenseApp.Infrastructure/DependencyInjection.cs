@@ -1,6 +1,5 @@
 using System;
-using ExpenseApp.Application.Abstractions;
-using ExpenseApp.Application.Services;
+using ExpenseApp.Domain.Data.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 using ExpenseApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +18,8 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ITransactionRepository, TransactionRepository>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ITransactionUnitOfWork, TransactionUnitOfWork>();
 
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ExpenseDbContext>());
 
         return services;
     }

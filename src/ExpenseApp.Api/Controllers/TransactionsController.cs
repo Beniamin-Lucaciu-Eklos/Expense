@@ -1,46 +1,52 @@
 using System;
 using ExpenseApp.Application.Dtos;
-using ExpenseApp.Application.Services;
-using ExpenseApp.Domain.Data.Models;
+using ExpenseApp.Application.Transactions.CreateTransaction;
+using ExpenseApp.Application.Transactions.TransactionQueries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseApp.Api.Controllers;
 
-public class TransactionsController(ITransactionUnitOfWork uowITransaction) : BaseApiController
+public class TransactionsController(ISender sender) : BaseApiController
 {
     [HttpGet]
     public async Task<IActionResult> GetAllTransactions()
     {
-        var result = await uowITransaction.GetAllAsync();
+        var result = await sender.Send(new GetAllTransactionsQuery());
+
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetTransaction(int id)
     {
-        var result = await uowITransaction.GetByIdAsync(id);
+        var result = await sender.Send(new GetTransactionByIdQuery(id));
 
-        return result is not null ? Ok(result) : NotFound();
+        return result.IsSuccess ? Ok(result.Value) : NotFound();
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateTransaction([FromBody] TransactionDto transactionDto)
     {
-        var transaction = new Transaction
-        {
-            Amount = transactionDto.Amount,
-            Type = transactionDto.Type,
-            Category = transactionDto.Category,
-            Description = transactionDto.Description,
-            CreatedAt = DateTime.UtcNow,
-            UpdateAt = DateTime.UtcNow
-        };
+        var command = new CreateTransactionCommand(
+            transactionDto.Type,
+            transactionDto.Amount,
+            transactionDto.Category,
+            transactionDto.Description);
 
-        transaction = await uowITransaction.CreateAsync(transaction);
+        var result = await sender.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
 
         return CreatedAtAction(nameof(GetTransaction),
-            new { id = transaction.Id }, transaction);
+            new { id = result.Value }, result.Value);
     }
+    /*
+
+  
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] TransactionDto transactionDto)
@@ -65,5 +71,5 @@ public class TransactionsController(ITransactionUnitOfWork uowITransaction) : Ba
     {
         var result = await uowITransaction.Delete(id);
         return result is not null ? Ok(result) : NotFound();
-    }
+    }*/
 }
