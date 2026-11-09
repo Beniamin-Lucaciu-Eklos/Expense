@@ -1,3 +1,4 @@
+using ExpenseApp.Infrastructure;
 using ExpenseApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,7 @@ public class Program
 
         builder.Services.AddControllers();
 
-        builder.Services.AddDbContext<ExpenseDbContext>(options =>
-        {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DB"));
-        });
+        builder.Services.AddInfrastructure(builder.Configuration);
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddEndpointsApiExplorer();
