@@ -9,7 +9,7 @@ public interface ITransactionRepository
 
     Task<Transaction> CreateAsync(Transaction transaction);
 
-    Task<Transaction?> UpdateAsync(Transaction transaction);
+    Task<Transaction?> UpdateAsync(int id, Transaction transaction);
 
     Task<Transaction?> Delete(int id);
 }

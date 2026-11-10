@@ -1,6 +1,6 @@
 using System;
 
-namespace ExpenseApp.Domain.Data.Abstractions;
+namespace ExpenseApp.Domain.Abstractions;
 
 public interface IUnitOfWork
 {

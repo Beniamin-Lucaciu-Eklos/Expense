@@ -1,7 +1,10 @@
 using System;
 using ExpenseApp.Application.Dtos;
 using ExpenseApp.Application.Transactions.CreateTransaction;
+using ExpenseApp.Application.Transactions.DeleteTransaction;
 using ExpenseApp.Application.Transactions.TransactionQueries;
+using ExpenseApp.Application.Transactions.UpdateTransaction;
+using ExpenseApp.Domain.Data.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +17,7 @@ public class TransactionsController(ISender sender) : BaseApiController
     {
         var result = await sender.Send(new GetAllTransactionsQuery());
 
-        return Ok(result);
+        return Ok(result.Value);
     }
 
     [HttpGet("{id:int}")]
@@ -44,32 +47,29 @@ public class TransactionsController(ISender sender) : BaseApiController
         return CreatedAtAction(nameof(GetTransaction),
             new { id = result.Value }, result.Value);
     }
-    /*
-
-  
-
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] TransactionDto transactionDto)
-    {
-        var transaction = new Transaction
-        {
-            Id = id,
-            Amount = transactionDto.Amount,
-            Type = transactionDto.Type,
-            Category = transactionDto.Category,
-            Description = transactionDto.Description,
-            CreatedAt = DateTime.UtcNow,
-            UpdateAt = DateTime.UtcNow
-        };
-
-        var result = await uowITransaction.UpdateAsync(transaction);
-        return result is not null ? Ok(result) : NotFound();
-    }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await uowITransaction.Delete(id);
-        return result is not null ? Ok(result) : NotFound();
-    }*/
+        var result = await sender.Send(new DeleteTransactionCommand(id));
+
+        if (result.IsFailure)
+            return result.Error == TransactionErrors.NotFound
+             ? NotFound() : BadRequest(result.Error);
+
+        return NoContent();
+    }
+
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] TransactionDto transactionDto)
+    {
+        var result = await sender.Send(new UpdateTransactionCommand(id, transactionDto));
+
+        if (result.IsFailure)
+            return result.Error == TransactionErrors.NotFound
+             ? NotFound() : BadRequest(result.Error);
+
+        return NoContent();
+    }
 }

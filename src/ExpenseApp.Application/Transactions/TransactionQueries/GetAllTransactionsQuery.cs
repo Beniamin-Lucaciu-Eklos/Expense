@@ -1,6 +1,6 @@
 using System;
 using ExpenseApp.Application.Abstractions.Messaging;
-using ExpenseApp.Domain.Data.Abstractions;
+using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 
 namespace ExpenseApp.Application.Transactions.TransactionQueries;

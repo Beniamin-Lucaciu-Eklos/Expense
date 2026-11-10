@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ExpenseApp.Domain.Data.Abstractions;
+namespace ExpenseApp.Domain.Abstractions;
 
 public record Error(string Code, string Name)
 {

@@ -22,19 +22,19 @@ public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRep
         return transaction;
     }
 
-    public async Task<Transaction?> UpdateAsync(Transaction transaction)
+    public async Task<Transaction?> UpdateAsync(int id, Transaction transaction)
     {
-        if (transaction is null or { Id: <= 0 })
+        if (id == 0)
             return null;
 
-        var transactionFromDb = await GetByIdAsync(transaction.Id);
+        var transactionFromDb = await GetByIdAsync(id);
         if (transactionFromDb is null)
             return null;
 
-        transactionFromDb.Amount = transaction.Amount;
-        transactionFromDb.Category = transaction.Category;
-        transactionFromDb.Description = transaction.Description;
-        transactionFromDb.UpdateAt = DateTime.UtcNow;
+        transactionFromDb.Update(transaction.Type,
+            transaction.Amount,
+            transaction.Category,
+            transaction.Description);
 
         dbContext.Transactions.Update(transactionFromDb);
         return transactionFromDb;

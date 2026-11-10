@@ -16,7 +16,7 @@ public sealed class TransactionResponse
 
     public DateTime CreatedAt { get; init; }
 
-    public DateTime UpdateAt { get; init; }
+    public DateTime UpdatedAt { get; init; }
 }
 
 internal static class TransactionMapping
@@ -36,7 +36,7 @@ internal static class TransactionMapping
             Category = transaction.Category,
             Description = transaction.Description,
             CreatedAt = transaction.CreatedAt,
-            UpdateAt = transaction.UpdateAt,
+            UpdatedAt = transaction.UpdatedAt,
         };
     }
 }

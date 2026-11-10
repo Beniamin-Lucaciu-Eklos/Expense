@@ -1,6 +1,6 @@
 using System;
 using ExpenseApp.Application.Exceptions;
-using ExpenseApp.Domain.Data.Abstractions;
+using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 using Microsoft.EntityFrameworkCore;
 

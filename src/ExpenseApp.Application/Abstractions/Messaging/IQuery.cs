@@ -1,4 +1,4 @@
-using ExpenseApp.Domain.Data.Abstractions;
+using ExpenseApp.Domain.Abstractions;
 using MediatR;
 
 namespace ExpenseApp.Application.Abstractions.Messaging;

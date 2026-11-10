@@ -1,5 +1,5 @@
 using System;
-using ExpenseApp.Domain.Data.Abstractions;
+using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 using ExpenseApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
