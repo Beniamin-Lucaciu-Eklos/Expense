@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using ExpenseApp.Api.Constants;
 using ExpenseApp.Application;
 using ExpenseApp.Infrastructure;
 using ExpenseApp.Infrastructure.Data;
@@ -13,12 +15,21 @@ public class Program
 
         // Add services to the container.
 
-        builder.Services.AddControllers();
-
-        builder.Services.AddCors(options => options.AddPolicy("AllowAll", opt => opt.AllowAnyHeader()
-                                                                                    .AllowAnyMethod()
-                                                                                    .AllowAnyOrigin())
-                                                                                    );
+        builder.Services.AddControllers()
+                .AddJsonOptions(config =>
+                {
+                    config.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(CorsConstants.DefaultPolicy,
+                opt =>
+                {
+                    opt.AllowAnyHeader()
+                         .AllowAnyMethod()
+                         .AllowAnyOrigin();
+                });
+        });
 
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
@@ -36,7 +47,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        app.UseCors("AllowAll");
+        app.UseCors(CorsConstants.DefaultPolicy);
 
         app.UseHttpsRedirection();
 

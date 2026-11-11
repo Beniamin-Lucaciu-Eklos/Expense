@@ -1,9 +1,10 @@
 using System;
+using ExpenseApp.Domain.Data.Models;
 
 namespace ExpenseApp.Application.Dtos;
 
 public record TransactionDto(
-    string Type,
+    TransactionType Type,
     double Amount,
     string Category,
     string Description);

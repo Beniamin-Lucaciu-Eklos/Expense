@@ -49,8 +49,7 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(350)
-                        .HasColumnType("nvarchar(350)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");

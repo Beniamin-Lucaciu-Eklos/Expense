@@ -6,7 +6,7 @@ public sealed class TransactionResponse
 {
     public int Id { get; init; }
 
-    public required string Type { get; init; }
+    public TransactionType Type { get; init; }
 
     public double Amount { get; init; }
 

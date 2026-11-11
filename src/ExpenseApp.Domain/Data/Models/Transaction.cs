@@ -6,7 +6,7 @@ public class Transaction : BaseEntity
 {
     private Transaction() { }
 
-    public string Type { get; private set; } = default!;
+    public TransactionType Type { get; private set; }
 
     public double Amount { get; private set; }
 
@@ -14,7 +14,7 @@ public class Transaction : BaseEntity
 
     public string Description { get; private set; } = default!;
 
-    public static Transaction Create(string type, double amount, string category, string description)
+    public static Transaction Create(TransactionType type, double amount, string category, string description)
     {
         var transaction = new Transaction()
         {
@@ -29,7 +29,7 @@ public class Transaction : BaseEntity
         return transaction;
     }
 
-    public void Update(string type, double amount, string category, string description)
+    public void Update(TransactionType type, double amount, string category, string description)
     {
         Type = type;
         Amount = amount;
