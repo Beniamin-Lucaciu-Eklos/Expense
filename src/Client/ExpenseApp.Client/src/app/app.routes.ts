@@ -8,8 +8,8 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
     { path: 'transactions', component: TransactionList },
-    { path: 'transactions-add', component: TransactionForm },
-    { path: 'transactions-edit/:id', component: TransactionForm },
+    { path: 'transactions/add', component: TransactionForm },
+    { path: 'transactions/edit/:id', component: TransactionForm },
     { path: '', redirectTo: '/transactions', pathMatch: 'full' },
     { path: '**', redirectTo: '/transactions' }
 ];

@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core
 import { Transaction } from '../../models/transaction';
 import { TransactionService } from '../../services/transaction.service';
 import { NgClass, CurrencyPipe, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-transaction-list',
@@ -10,8 +11,8 @@ import { NgClass, CurrencyPipe, DatePipe } from '@angular/common';
   styleUrl: './transaction-list.css',
 })
 export class TransactionList implements OnInit {
-
   private transactionService = inject(TransactionService);
+  private router = inject(Router);
 
   transactions: WritableSignal<Transaction[]> = signal([]);
 
@@ -45,5 +46,12 @@ export class TransactionList implements OnInit {
   getNetBalance(): number {
     return this.getTotalIncome() - this.getTotalExpense();
   }
+
+  editTransaction(transaction: Transaction) {
+    if (transaction.id) {
+      this.router.navigate(['transactions/edit/', transaction.id]);
+    }
+  }
+
 }
 
