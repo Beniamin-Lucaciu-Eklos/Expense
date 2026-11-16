@@ -1,18 +1,41 @@
 using ExpenseApp.Application.Abstractions.Messaging;
+using ExpenseApp.Application.Dtos;
 using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 
 namespace ExpenseApp.Application.Authorization;
 
-internal class RegisterUserCommandHandler(IUserRepository userRepository, IUnitOfWork uow) : ICommandHandler<RegisterUserCommand, RegisterUserResponse>
+public sealed record RegisterUserCommand(RegisterUserDto RegisterUserDto) : ICommand<RegisterUserResponse>;
+
+public sealed record RegisterUserResponse(string Token);
+
+internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+{
+    public RegisterUserCommandValidator()
+    {
+        RuleFor(u => u.RegisterUserDto.Password).NotEmpty();
+
+        RuleFor(u => u.RegisterUserDto.Email).NotEmpty()
+                                             .MaximumLength(330);
+    }
+}
+
+internal class RegisterUserCommandHandler(
+    IUserRepository userRepository,
+    IPasswordHasher<User> userPasswordHasher,
+    IUnitOfWork uow) : ICommandHandler<RegisterUserCommand, RegisterUserResponse>
 {
     public async Task<Result<RegisterUserResponse>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
     {
-        var dto = command.RegisterUserDto;
-        if (await userRepository.ExistsAsync(dto.Email))
-            Result.Failure<RegisterUserResponse>(UserErrors.EmailAlreadyExists);
+        var registerDto = command.RegisterUserDto;
+        if (await userRepository.ExistsAsync(registerDto.Email))
+            return Result.Failure<RegisterUserResponse>(UserErrors.EmailAlreadyExists);
 
-        var user = User.Create(dto.Email, dto.Password);
+        var passwordHasshed = userPasswordHasher.HashPassword(null, registerDto.Password);
+
+        var user = User.Create(registerDto.Email, passwordHasshed);
         await userRepository.AddAsync(user);
         await uow.SaveChangesAsync();
 

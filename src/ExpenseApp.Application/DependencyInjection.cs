@@ -1,5 +1,7 @@
 using System;
+using ExpenseApp.Domain.Data.Models;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExpenseApp.Application;
@@ -19,6 +21,8 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(currentAssembly);
+
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
         return services;
     }
