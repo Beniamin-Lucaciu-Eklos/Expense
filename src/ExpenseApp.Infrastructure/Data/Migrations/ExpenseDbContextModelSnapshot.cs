@@ -83,7 +83,12 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("VARCHAR(2048)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -91,6 +96,9 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Password")
                         .IsUnique();
 
                     b.ToTable("users", (string)null);

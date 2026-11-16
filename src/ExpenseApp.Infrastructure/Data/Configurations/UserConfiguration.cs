@@ -15,10 +15,20 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasKey(user => user.Id);
 
+        builder.Property(user => user.Password)
+               .IsRequired();
+
+        builder.Property(user => user.Token)
+               .HasMaxLength(2048)
+               .HasColumnType("VARCHAR(2048)")
+               .IsRequired();
+
         builder.Property(user => user.Email)
                .HasMaxLength(330)
                .IsRequired();
 
+
         builder.HasIndex(user => user.Email).IsUnique();
+        builder.HasIndex(user => user.Password).IsUnique();
     }
 }

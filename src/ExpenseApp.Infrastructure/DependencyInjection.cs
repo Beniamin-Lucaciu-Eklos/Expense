@@ -1,7 +1,9 @@
 using System;
+using ExpenseApp.Application.Authorization;
 using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 using ExpenseApp.Infrastructure.Data;
+using ExpenseApp.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,8 +20,11 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ITransactionRepository, TransactionRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ExpenseDbContext>());
+
+        services.AddTransient<ITokenService, TokenService>();
 
         return services;
     }

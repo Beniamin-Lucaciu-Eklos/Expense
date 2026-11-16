@@ -3,7 +3,9 @@ using ExpenseApp.Api.Constants;
 using ExpenseApp.Application;
 using ExpenseApp.Infrastructure;
 using ExpenseApp.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ExpenseApp.Api;
 
@@ -15,11 +17,14 @@ public class Program
 
         // Add services to the container.
 
+        builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
+
         builder.Services.AddControllers()
                 .AddJsonOptions(config =>
                 {
                     config.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(CorsConstants.DefaultPolicy,
@@ -30,6 +35,8 @@ public class Program
                          .AllowAnyOrigin();
                 });
         });
+
+        builder.Services.AddAuthenticationFeatures(builder.Configuration);
 
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
@@ -51,8 +58,11 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseSerilogRequestLogging();
+
         app.UseCustomExceptionHandler();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { Transaction } from '../../models/transaction';
 import { TransactionService } from '../../services/transaction.service';
 import { NgClass, CurrencyPipe, DatePipe } from '@angular/common';
@@ -22,6 +22,9 @@ export class TransactionList implements OnInit {
 
   initialize() {
     this.getTransactions();
+    this.getTotalIncome();
+    this.getTotalExpense();
+    this.getNetBalance();
   }
 
   getTransactions() {
@@ -53,5 +56,17 @@ export class TransactionList implements OnInit {
     }
   }
 
+  deleteTransaction(transaction: Transaction, el: HTMLButtonElement) {
+    if (transaction.id) {
+      this.transactionService.delete(transaction.id).subscribe({
+        next: next => {
+          this.initialize();
+          el.click();
+        },
+        error: error => console.log(error)
+      });
+
+    }
+  }
 }
 

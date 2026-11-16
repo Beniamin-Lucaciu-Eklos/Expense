@@ -54,9 +54,45 @@
                     <td [ngClass]="transaction.type === 'Income' ? 'text-success': 'text-danger'">{{transaction.amount |
                         currency}}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" (click)="editTransaction(transaction)">
-                            <i class="bi bi-pencil"></i>
-                        </button>
+                        <div class="container text-center">
+                            <div class="row gap-2">
+                                <div class="col">
+                                    <button class="btn btn-sm btn-outline-primary me-1"
+                                        (click)="editTransaction(transaction)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+
+                                <div class="col">
+                                    <button class="btn btn-sm btn-danger me-1" data-bs-toggle="modal"
+                                        data-bs-target="#removeTransactionModal">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="removeTransactionModal" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-body">
+                                                    <blockquote class="blockquote text-danger">
+                                                        <p>Delete?</p>
+                                                    </blockquote>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                         #btnRemoveTransaction
+                                                        data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-danger"
+                                                            (click)="deleteTransaction(transaction,btnRemoveTransaction)">Delete</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 }
