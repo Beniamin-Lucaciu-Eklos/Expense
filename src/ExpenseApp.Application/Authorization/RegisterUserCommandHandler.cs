@@ -9,7 +9,7 @@ namespace ExpenseApp.Application.Authorization;
 
 public sealed record RegisterUserCommand(RegisterUserDto RegisterUserDto) : ICommand<RegisterUserResponse>;
 
-public sealed record RegisterUserResponse(string Token);
+public sealed record RegisterUserResponse(string Token, string Email);
 
 internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
@@ -39,6 +39,6 @@ internal class RegisterUserCommandHandler(
         await userRepository.AddAsync(user);
         await uow.SaveChangesAsync();
 
-        return Result.Success(new RegisterUserResponse(user.Token));
+        return Result.Success(new RegisterUserResponse(user.Token, user.Email));
     }
 }

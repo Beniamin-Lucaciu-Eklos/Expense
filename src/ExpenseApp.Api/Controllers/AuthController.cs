@@ -28,7 +28,7 @@ public class AuthController(ISender sender) : BaseApiController
             };
         }
 
-        return Ok(new { Token = result.Value.Token });
+        return Ok(new { Token = result.Value.Token, Email = result.Value.Email });
     }
 
     [HttpPost("register")]
@@ -50,6 +50,6 @@ public class AuthController(ISender sender) : BaseApiController
             };
         }
 
-        return Ok(new { Token = result.Value.Token });
+        return Ok(new { Token = result.Value.Token, Email = result.Value.Email });
     }
 }

@@ -28,6 +28,8 @@ export class Signup {
       {
         validator: [this.passwordMatchValidator]
       });
+
+    this.signupForm.markAllAsTouched();
   }
 
   hasError(controlName: string, errorName: string): boolean {

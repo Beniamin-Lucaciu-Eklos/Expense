@@ -44,7 +44,7 @@ export class TransactionForm implements OnInit {
 
   ngOnInit(): void {
     const type = this.transactionForm.get('type')?.value;
-    this.updateAvailableCategories(type);
+    this.setAvailableCategories(type);
 
     const id = this.activatedRoute.snapshot.paramMap.get('id');
     if (id) {
@@ -52,10 +52,15 @@ export class TransactionForm implements OnInit {
       this.isEditModel.set(true);
       this.loadTransaction(this.transactionId);
     }
+
+    this.transactionForm.markAllAsTouched();
   }
+
   loadTransaction(id: number) {
     this.transactionService.getById(id).subscribe({
       next: transaction => {
+        this.setAvailableCategories(transaction.type);
+
         this.transactionForm.patchValue({
           type: transaction.type,
           category: transaction.category,
@@ -69,13 +74,20 @@ export class TransactionForm implements OnInit {
 
   onTypeChange() {
     const type = this.transactionForm.get('type')?.value;
-    this.updateAvailableCategories(type);
-  }
-
-  updateAvailableCategories(type: string) {
-    this.availableCategories = type === 'Expense' ? this.expenseCategories : this.incomeCategories;
+    this.setAvailableCategories(type);
     this.transactionForm.patchValue({ category: '' });
   }
+
+  setAvailableCategories(type: string) {
+    this.availableCategories =
+      type === 'Expense' ? this.expenseCategories : this.incomeCategories;
+  }
+
+  hasError(controlName: string, errorName: string): boolean {
+    const control = this.transactionForm.get(controlName);
+    return !!control && (control.touched || control.dirty) && control.hasError(errorName);
+  }
+
   onSubmit() {
     if (this.transactionForm.valid) {
       const transaction = this.transactionForm.value;

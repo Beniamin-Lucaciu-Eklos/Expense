@@ -1,4 +1,4 @@
-<div class="container py-4">
+<div class="container-lg py-4">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm">
@@ -13,19 +13,28 @@
                         <div class="mb-4">
                             <label for="type" class="form-label fw-medium">Type</label>
                             <select class="form-select form-select-lg" id="type" formControlName="type"
-                                (change)="onTypeChange()">
+                                (change)="onTypeChange()" [ngClass]="{'is-invalid':hasError('type', 'required')}">
                                 <option value="Expense">Expense</option>
                                 <option value="Income">Income</option>
                             </select>
+
+                            @if(hasError('type', 'required')){
+                            <div class="invalid-feedback">type is required</div>
+                            }
                         </div>
 
                         <div class="mb-4">
                             <label for="category" class="form-label fw-medium">Category</label>
-                            <select class="form-select form-select-lg" id="category" formControlName="category">
+                            <select class="form-select form-select-lg" id="category" formControlName="category"
+                                [ngClass]="{'is-invalid':hasError('category', 'required')}">
                                 @for (category of availableCategories; track $index) {
                                 <option [value]="category">{{category}}</option>
                                 }
                             </select>
+
+                            @if(hasError('category', 'required')){
+                            <div class="invalid-feedback">type is required</div>
+                            }
                         </div>
 
                         <div class="mb-4">
@@ -33,15 +42,33 @@
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control form-control-lg" id="amount"
-                                    formControlName="amount" placeholder="0.00" />
+                                    formControlName="amount" placeholder="0.00"
+                                    [ngClass]="{'is-invalid':hasError('amount', 'required') || hasError('amount', 'min')}" />
                             </div>
+
+                            @if(hasError('amount', 'required')){
+                            <div class="invalid-feedback">amount is required</div>
+                            }
+                            @if(hasError('amount', 'min')){
+                            <div class="invalid-feedback">amount min is 0</div>
+                            }
                         </div>
 
                         <div class="mb-4">
                             <label for="description" class="form-label fw-medium">Description</label>
 
                             <textarea class="form-control form-control-lg" id="description" rows="4"
-                                formControlName="description"></textarea>
+                                formControlName="description"
+                                [ngClass]="{'is-invalid':hasError('description', 'required') || hasError('description', 'maxlength')}">
+                                </textarea>
+
+                            @if(hasError('description', 'required')){
+                            <div class="invalid-feedback">description is required</div>
+                            }
+                            @if(hasError('description', 'maxlength')){
+                            <div class="invalid-feedback">description maxLength is 500 - actually
+                                {{transactionForm.get('description')?.value.length}}</div>
+                            }
                         </div>
 
                         <div class="d-flex gap-3 justify-content-end mt-4">

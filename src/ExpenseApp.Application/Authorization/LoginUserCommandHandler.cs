@@ -10,7 +10,7 @@ namespace ExpenseApp.Application.Authorization;
 
 public sealed record LoginUserCommand(LoginUserDto UserDto) : ICommand<LoginUserResponse>;
 
-public sealed record LoginUserResponse(string Token);
+public sealed record LoginUserResponse(string Token, string Email);
 
 internal class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {
@@ -42,6 +42,6 @@ internal sealed class LoginUserCommandHandler(
             return Result.Failure<LoginUserResponse>(UserErrors.InvalidCredentials);
 
         var token = userService.GenerateJwtToken(user);
-        return Result.Success(new LoginUserResponse(token));
+        return Result.Success(new LoginUserResponse(token, user.Email));
     }
 }

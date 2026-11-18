@@ -4,14 +4,14 @@
             <a class="navbar-brand mr-4" href="#">Expense Tracker</a>
         </div>
 
-        @if(authService.currentUser$ | async){
+        @if(authService.isLoggedIn()){
         <div class="ms-auto">
             <a class="btn btn-outline-light me-2" [routerLink]="'transactions/add'">
                 <i class="bi bi-plus-circle me-1"></i>
                 Create transaction</a>
             <a class="btn btn-outline-light me-2" (click)="authService.logout()">
                 <i class="bi bi-box-arrow-in-left me-1"></i>
-                Logout</a>
+                {{authService.currentUser()?.email}}, Logout</a>
 
         </div>
         }
