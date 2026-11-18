@@ -1,5 +1,6 @@
 using System;
 using ExpenseApp.Application.Abstractions.Messaging;
+using ExpenseApp.Application.Authorization;
 using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 
@@ -7,11 +8,15 @@ namespace ExpenseApp.Application.Transactions.DeleteTransaction;
 
 public sealed record DeleteTransactionCommand(int id) : ICommand<bool>;
 
-public sealed class DeleteTransactionHandler(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteTransactionCommand, bool>
+public sealed class DeleteTransactionHandler(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IUserService userService) : ICommandHandler<DeleteTransactionCommand, bool>
 {
     public async Task<Result<bool>> Handle(DeleteTransactionCommand command, CancellationToken cancellationToken)
     {
-        var result = await transactionRepository.Delete(command.id);
+        var userId = userService.GetUserIdFromNameIdentifiedClaim();
+        if (userId.IsFailure)
+            return Result.Failure<bool>(TransactionErrors.UnAuthorized);
+
+        var result = await transactionRepository.Delete(command.id, userId.Value);
 
         await unitOfWork.SaveChangesAsync();
 

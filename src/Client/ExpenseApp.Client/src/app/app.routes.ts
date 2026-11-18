@@ -3,13 +3,26 @@ import { Login } from './components/login/login';
 import { Signup } from './components/signup/signup';
 import { TransactionList } from './components/transaction-list/transaction-list';
 import { TransactionForm } from './components/transaction-form/transaction-form';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'signup', component: Signup },
-    { path: 'transactions', component: TransactionList },
-    { path: 'transactions/add', component: TransactionForm },
-    { path: 'transactions/edit/:id', component: TransactionForm },
-    { path: '', redirectTo: '/transactions', pathMatch: 'full' },
+    {
+        path: 'transactions',
+        component: TransactionList,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'transactions/add',
+        component: TransactionForm,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'transactions/edit/:id',
+        component: TransactionForm,
+        canActivate: [authGuard]
+    },
+    /*{ path: '', redirectTo: '/transactions', pathMatch: 'full', canActivate: [authGuard] },*/
     { path: '**', redirectTo: '/transactions' }
 ];

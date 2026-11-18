@@ -30,6 +30,9 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<double>("Amount")
                         .HasPrecision(18, 2)
                         .HasColumnType("float(18)");
@@ -54,13 +57,15 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id", "UserId");
 
                     b.HasIndex("Amount");
 
                     b.HasIndex("Category");
 
                     b.HasIndex("Description");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("transactions", (string)null);
                 });
@@ -102,6 +107,17 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("ExpenseApp.Domain.Data.Models.Transaction", b =>
+                {
+                    b.HasOne("ExpenseApp.Domain.Data.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using ExpenseApp.Application.Dtos;
 using ExpenseApp.Application.Transactions.CreateTransaction;
 using ExpenseApp.Application.Transactions.DeleteTransaction;
@@ -6,10 +7,12 @@ using ExpenseApp.Application.Transactions.TransactionQueries;
 using ExpenseApp.Application.Transactions.UpdateTransaction;
 using ExpenseApp.Domain.Data.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseApp.Api.Controllers;
 
+[Authorize]
 public class TransactionsController(ISender sender) : BaseApiController
 {
     [HttpGet]
@@ -25,7 +28,19 @@ public class TransactionsController(ISender sender) : BaseApiController
     {
         var result = await sender.Send(new GetTransactionByIdQuery(id));
 
-        return result.IsSuccess ? Ok(result.Value) : NotFound();
+        if (result.IsFailure)
+        {
+            return result.Error.Code switch
+            {
+                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
+
+                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
+
+                _ => BadRequest(result.Error)
+            };
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpPost]
@@ -41,7 +56,14 @@ public class TransactionsController(ISender sender) : BaseApiController
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return result.Error.Code switch
+            {
+                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
+
+                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
+
+                _ => BadRequest(result.Error)
+            };
         }
 
         return CreatedAtAction(nameof(GetTransaction),
@@ -54,12 +76,19 @@ public class TransactionsController(ISender sender) : BaseApiController
         var result = await sender.Send(new DeleteTransactionCommand(id));
 
         if (result.IsFailure)
-            return result.Error == TransactionErrors.NotFound
-             ? NotFound() : BadRequest(result.Error);
+        {
+            return result.Error.Code switch
+            {
+                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
+
+                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
+
+                _ => BadRequest(result.Error)
+            };
+        }
 
         return NoContent();
     }
-
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] TransactionDto transactionDto)
@@ -67,8 +96,16 @@ public class TransactionsController(ISender sender) : BaseApiController
         var result = await sender.Send(new UpdateTransactionCommand(id, transactionDto));
 
         if (result.IsFailure)
-            return result.Error == TransactionErrors.NotFound
-             ? NotFound() : BadRequest(result.Error);
+        {
+            return result.Error.Code switch
+            {
+                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
+
+                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
+
+                _ => BadRequest(result.Error)
+            };
+        }
 
         return NoContent();
     }

@@ -1,5 +1,6 @@
 using System;
 using ExpenseApp.Application.Abstractions.Messaging;
+using ExpenseApp.Application.Authorization;
 using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
 
@@ -7,12 +8,16 @@ namespace ExpenseApp.Application.Transactions.TransactionQueries;
 
 public sealed record GetAllTransactionsQuery() : IQuery<IReadOnlyList<TransactionResponse>>;
 
-internal sealed class GetAllTransactionsQueryHandler(ITransactionRepository transactionRepository)
+internal sealed class GetAllTransactionsQueryHandler(ITransactionRepository transactionRepository, IUserService userService)
      : IQueryHandler<GetAllTransactionsQuery, IReadOnlyList<TransactionResponse>>
 {
     public async Task<Result<IReadOnlyList<TransactionResponse>>> Handle(GetAllTransactionsQuery query, CancellationToken cancellationToken)
     {
-        var results = await transactionRepository.GetAllAsync();
+        var userId = userService.GetUserIdFromNameIdentifiedClaim();
+        if (userId.IsFailure)
+            return Result.Failure<IReadOnlyList<TransactionResponse>>(TransactionErrors.UnAuthorized);
+
+        var results = await transactionRepository.GetAllAsync(userId.Value);
 
         var response = results.AsResponse();
 

@@ -14,7 +14,11 @@ public class Transaction : BaseEntity
 
     public string Description { get; private set; } = default!;
 
-    public static Transaction Create(TransactionType type, double amount, string category, string description)
+    public int UserId { get; private set; }
+    public User User { get; private set; } = default!;
+
+    public static Transaction Create(TransactionType type,
+     double amount, string category, string description, int userId)
     {
         var transaction = new Transaction()
         {
@@ -23,7 +27,8 @@ public class Transaction : BaseEntity
             Category = category,
             Description = description,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            UserId = userId
         };
 
         return transaction;

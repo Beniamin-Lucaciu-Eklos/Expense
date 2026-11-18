@@ -9,11 +9,6 @@ namespace ExpenseApp.Api;
 
 public static class DependencyInjection
 {
-    public static void UseCustomExceptionHandler(this IApplicationBuilder app)
-    {
-        app.UseMiddleware<ExceptionHandlingMiddleware>();
-    }
-
     public static IServiceCollection AddAuthenticationFeatures(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -33,5 +28,10 @@ public static class DependencyInjection
                         });
 
         return services;
+    }
+
+    public static void UseCustomExceptionHandler(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
     }
 }

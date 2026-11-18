@@ -6,14 +6,16 @@ namespace ExpenseApp.Infrastructure.Data;
 
 public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRepository
 {
-    public async Task<IEnumerable<Transaction>> GetAllAsync()
+    public async Task<IEnumerable<Transaction>> GetAllAsync(int userId)
     {
-        return await dbContext.Transactions.AsNoTracking().ToListAsync();
+        return await dbContext.Transactions.Include(t => t.User)
+                .Where(transaction => transaction.UserId == userId)
+                .AsNoTracking().ToListAsync();
     }
 
-    public async Task<Transaction?> GetByIdAsync(int id)
+    public async Task<Transaction?> GetByIdAsync(int id, int userId)
     {
-        return await dbContext.Transactions.FindAsync(id);
+        return await dbContext.Transactions.FindAsync(id, userId);
     }
 
     public async Task<Transaction> CreateAsync(Transaction transaction)
@@ -27,7 +29,7 @@ public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRep
         if (id == 0)
             return null;
 
-        var transactionFromDb = await GetByIdAsync(id);
+        var transactionFromDb = await GetByIdAsync(id, transaction.UserId);
         if (transactionFromDb is null)
             return null;
 
@@ -40,9 +42,9 @@ public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRep
         return transactionFromDb;
     }
 
-    public async Task<Transaction?> Delete(int id)
+    public async Task<Transaction?> Delete(int id, int userId)
     {
-        var transaction = await GetByIdAsync(id);
+        var transaction = await GetByIdAsync(id, userId);
         if (transaction is null)
             return null;
 

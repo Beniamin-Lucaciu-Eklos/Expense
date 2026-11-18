@@ -3,18 +3,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ExpenseApp.Application.Authorization;
+using ExpenseApp.Domain.Abstractions;
 using ExpenseApp.Domain.Data.Models;
+using Humanizer;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ExpenseApp.Infrastructure.Identity;
 
-public sealed class TokenService() : ITokenService
+public sealed class UserService(IUserClaimPrincipal userClaimPrincipal) : IUserService
 {
-    public string GenerateJwtTokenForUser(User user)
-    {        
+    private const string UserIdClaim = ClaimTypes.NameIdentifier;
+
+    public string GenerateJwtToken(User user)
+    {
         var claims = new Claim[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(UserIdClaim, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email)
         };
 
@@ -29,5 +33,12 @@ public sealed class TokenService() : ITokenService
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public Result<int> GetUserIdFromNameIdentifiedClaim()
+    {
+       string? nameIdentifierValue = userClaimPrincipal.GetNameIdentifiedValue();
+
+       return int.TryParse(nameIdentifierValue, out int userId) ? Result.Success(userId) : Result.Failure<int>(Error.NullValue);
     }
 }

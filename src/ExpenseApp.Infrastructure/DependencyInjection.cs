@@ -24,7 +24,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ExpenseDbContext>());
 
-        services.AddTransient<ITokenService, TokenService>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

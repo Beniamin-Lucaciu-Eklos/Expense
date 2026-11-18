@@ -14,7 +14,10 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
        {
               builder.ToTable(TableName);
 
-              builder.HasKey(transaction => transaction.Id);
+              builder.HasKey(transaction => new { transaction.Id, transaction.UserId });
+
+              builder.Property(t => t.Id)
+                  .ValueGeneratedOnAdd();
 
               builder.Property(transaction => transaction.Type)
                      .HasConversion(new EnumToStringConverter<TransactionType>())
@@ -30,6 +33,10 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
               builder.Property(transaction => transaction.Description)
                      .HasMaxLength(500)
                      .IsRequired();
+
+              builder.HasOne(transaction => transaction.User)
+                     .WithMany()
+                     .HasForeignKey(transaction => transaction.UserId);
 
               builder.HasIndex(transaction => transaction.Amount);
               builder.HasIndex(transaction => transaction.Category);

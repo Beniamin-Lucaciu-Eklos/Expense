@@ -25,14 +25,14 @@ internal class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 internal sealed class LoginUserCommandHandler(
     IUserRepository userRepository,
     IPasswordHasher<User> userPasswordHasher,
-    ITokenService tokenService) : ICommandHandler<LoginUserCommand, LoginUserResponse>
+    IUserService userService) : ICommandHandler<LoginUserCommand, LoginUserResponse>
 {
     public async Task<Result<LoginUserResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
         LoginUserDto userDto = command.UserDto;
         if (await userRepository.ExistsAsync(userDto.Email, userDto.Password, cancellationToken))
             return Result.Failure<LoginUserResponse>(UserErrors.InvalidCredentials);
-        
+
         var user = await userRepository.Load(userDto.Email, cancellationToken);
         if (user is null)
             return Result.Failure<LoginUserResponse>(UserErrors.NotFound);
@@ -41,7 +41,7 @@ internal sealed class LoginUserCommandHandler(
         if (result == PasswordVerificationResult.Failed)
             return Result.Failure<LoginUserResponse>(UserErrors.InvalidCredentials);
 
-        var token = tokenService.GenerateJwtTokenForUser(user);
+        var token = userService.GenerateJwtToken(user);
         return Result.Success(new LoginUserResponse(token));
     }
 }

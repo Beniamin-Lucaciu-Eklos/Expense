@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
+using ExpenseApp.Api.Authorization;
 using ExpenseApp.Api.Constants;
 using ExpenseApp.Application;
+using ExpenseApp.Application.Authorization;
 using ExpenseApp.Infrastructure;
 using ExpenseApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,10 +38,12 @@ public class Program
                 });
         });
 
+        builder.Services.AddHttpContextAccessor();
         builder.Services.AddAuthenticationFeatures(builder.Configuration);
 
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddScoped<IUserClaimPrincipal, UserClaimPrincipal>();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddEndpointsApiExplorer();

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseApp.Infrastructure.Data;
 
-public class UserRepository(ExpenseDbContext dbContext, ITokenService tokenService) : IUserRepository
+public class UserRepository(ExpenseDbContext dbContext, IUserService userService) : IUserRepository
 {
     public Task<User?> Load(string email, CancellationToken cancellationToken = default)
     {
@@ -14,7 +14,7 @@ public class UserRepository(ExpenseDbContext dbContext, ITokenService tokenServi
 
     public async Task<User> AddAsync(User user, CancellationToken cancellationToken = default)
     {
-        string jwtToken = tokenService.GenerateJwtTokenForUser(user);
+        string jwtToken = userService.GenerateJwtToken(user);
         user.SetJwtToken(jwtToken);
 
         await dbContext.Users.AddAsync(user, cancellationToken);
