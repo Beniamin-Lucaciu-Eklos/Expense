@@ -31,15 +31,15 @@ internal sealed class LoginUserCommandHandler(
     {
         LoginUserDto userDto = command.UserDto;
         if (await userRepository.ExistsAsync(userDto.Email, userDto.Password, cancellationToken))
-            return Result.Failure<LoginUserResponse>(UserErrors.InvalidCredentials);
+            return Result.Failure<LoginUserResponse>(UserInvalidCredentialsError.Create());
 
         var user = await userRepository.Load(userDto.Email, cancellationToken);
         if (user is null)
-            return Result.Failure<LoginUserResponse>(UserErrors.NotFound);
+            return Result.Failure<LoginUserResponse>(UserNotFoundError.Create());
 
         var result = userPasswordHasher.VerifyHashedPassword(user, user.Password, userDto.Password);
         if (result == PasswordVerificationResult.Failed)
-            return Result.Failure<LoginUserResponse>(UserErrors.InvalidCredentials);
+            return Result.Failure<LoginUserResponse>(UserInvalidCredentialsError.Create());
 
         var token = userService.GenerateJwtToken(user);
         return Result.Success(new LoginUserResponse(token, user.Email));

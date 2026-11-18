@@ -14,12 +14,12 @@ internal sealed class UpdateTransactionCommandHandler(ITransactionRepository tra
     {
         var userId = userService.GetUserIdFromNameIdentifiedClaim();
         if (userId.IsFailure)
-            return Result.Failure<int>(TransactionErrors.UnAuthorized);
+            return Result.Failure<int>(TransactionUnAuthorizedError.Create());
 
         var transaction = Transaction.Create(command.Dto.Type, command.Dto.Amount, command.Dto.Category, command.Dto.Description, userId.Value);
         var transactionFromDb = await transactionRepository.UpdateAsync(command.Id, transaction);
         if (transactionFromDb is null)
-            return Result.Failure<int>(TransactionErrors.NotFound);
+            return Result.Failure<int>(TransactionNotFoundError.Create());
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

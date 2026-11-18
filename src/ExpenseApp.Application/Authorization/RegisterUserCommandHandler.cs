@@ -31,9 +31,9 @@ internal class RegisterUserCommandHandler(
     {
         var registerDto = command.RegisterUserDto;
         if (await userRepository.ExistsAsync(registerDto.Email))
-            return Result.Failure<RegisterUserResponse>(UserErrors.EmailAlreadyExists);
+            return Result.Failure<RegisterUserResponse>(UserEmailAlreadyExistsError.Create());
 
-        var passwordHasshed = userPasswordHasher.HashPassword(null, registerDto.Password);
+        var passwordHasshed = userPasswordHasher.HashPassword(null!, registerDto.Password);
 
         var user = User.Create(registerDto.Email, passwordHasshed);
         await userRepository.AddAsync(user);

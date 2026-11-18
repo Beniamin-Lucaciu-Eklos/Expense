@@ -29,15 +29,8 @@ public class TransactionsController(ISender sender) : BaseApiController
         var result = await sender.Send(new GetTransactionByIdQuery(id));
 
         if (result.IsFailure)
-        {
-            return result.Error.Code switch
-            {
-                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
-
-                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
-
-                _ => BadRequest(result.Error)
-            };
+        {           
+            return HandleError(result.Error);
         }
 
         return Ok(result.Value);
@@ -55,15 +48,8 @@ public class TransactionsController(ISender sender) : BaseApiController
         var result = await sender.Send(command);
 
         if (result.IsFailure)
-        {
-            return result.Error.Code switch
-            {
-                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
-
-                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
-
-                _ => BadRequest(result.Error)
-            };
+        {           
+            return HandleError(result.Error);
         }
 
         return CreatedAtAction(nameof(GetTransaction),
@@ -76,15 +62,8 @@ public class TransactionsController(ISender sender) : BaseApiController
         var result = await sender.Send(new DeleteTransactionCommand(id));
 
         if (result.IsFailure)
-        {
-            return result.Error.Code switch
-            {
-                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
-
-                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
-
-                _ => BadRequest(result.Error)
-            };
+        {            
+            return HandleError(result.Error);
         }
 
         return NoContent();
@@ -97,14 +76,7 @@ public class TransactionsController(ISender sender) : BaseApiController
 
         if (result.IsFailure)
         {
-            return result.Error.Code switch
-            {
-                TransactionErrors.Codes.NotFound => NotFound(result.Error.Name),
-
-                TransactionErrors.Codes.UnAuthorized => BadRequest(result.Error.Name),
-
-                _ => BadRequest(result.Error)
-            };
+            return HandleError(result.Error);
         }
 
         return NoContent();

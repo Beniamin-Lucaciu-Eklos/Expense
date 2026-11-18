@@ -18,7 +18,10 @@ public class Transaction : BaseEntity
     public User User { get; private set; } = default!;
 
     public static Transaction Create(TransactionType type,
-     double amount, string category, string description, int userId)
+        double amount,
+        string category,
+        string description,
+        int userId)
     {
         var transaction = new Transaction()
         {

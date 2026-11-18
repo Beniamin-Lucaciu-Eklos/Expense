@@ -1,7 +1,5 @@
-using System;
 using ExpenseApp.Application.Authorization;
 using ExpenseApp.Application.Dtos;
-using ExpenseApp.Domain.Data.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,16 +14,7 @@ public class AuthController(ISender sender) : BaseApiController
 
         if (result.IsFailure)
         {
-            return result.Error.Code switch
-            {
-                UserErrors.Codes.NotFound => NotFound(result.Error.Name),
-
-                UserErrors.Codes.EmailAlreadyExists => Conflict(result.Error.Name),
-
-                UserErrors.Codes.InvalidCredentials => Unauthorized(),
-
-                _ => BadRequest(result.Error)
-            };
+            return HandleError(result.Error);
         }
 
         return Ok(new { Token = result.Value.Token, Email = result.Value.Email });
@@ -38,16 +27,7 @@ public class AuthController(ISender sender) : BaseApiController
 
         if (result.IsFailure)
         {
-            return result.Error.Code switch
-            {
-                UserErrors.Codes.NotFound => NotFound(result.Error.Name),
-
-                UserErrors.Codes.EmailAlreadyExists => Conflict(result.Error.Name),
-
-                UserErrors.Codes.InvalidCredentials => Unauthorized(),
-
-                _ => BadRequest(result.Error)
-            };
+            return HandleError(result.Error);
         }
 
         return Ok(new { Token = result.Value.Token, Email = result.Value.Email });

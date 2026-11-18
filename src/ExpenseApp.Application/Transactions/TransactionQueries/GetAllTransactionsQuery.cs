@@ -15,7 +15,7 @@ internal sealed class GetAllTransactionsQueryHandler(ITransactionRepository tran
     {
         var userId = userService.GetUserIdFromNameIdentifiedClaim();
         if (userId.IsFailure)
-            return Result.Failure<IReadOnlyList<TransactionResponse>>(TransactionErrors.UnAuthorized);
+            return Result.Failure<IReadOnlyList<TransactionResponse>>(TransactionUnAuthorizedError.Create());
 
         var results = await transactionRepository.GetAllAsync(userId.Value);
 

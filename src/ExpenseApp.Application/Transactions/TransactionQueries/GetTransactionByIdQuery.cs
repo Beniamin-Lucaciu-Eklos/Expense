@@ -14,11 +14,11 @@ internal sealed class GetTransactionByIdQueryHandler(ITransactionRepository tran
     {
         var userId = userService.GetUserIdFromNameIdentifiedClaim();
         if (userId.IsFailure)
-            return Result.Failure<TransactionResponse>(TransactionErrors.UnAuthorized);
+            return Result.Failure<TransactionResponse>(TransactionUnAuthorizedError.Create());
 
         var result = await transactionRepository.GetByIdAsync(query.id, userId.Value);
         if (result is null)
-            return Result.Failure<TransactionResponse>(TransactionErrors.NotFound);
+            return Result.Failure<TransactionResponse>(TransactionNotFoundError.Create());
 
         var response = result.AsResponse();
         return response;

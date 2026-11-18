@@ -14,12 +14,12 @@ public sealed class DeleteTransactionHandler(ITransactionRepository transactionR
     {
         var userId = userService.GetUserIdFromNameIdentifiedClaim();
         if (userId.IsFailure)
-            return Result.Failure<bool>(TransactionErrors.UnAuthorized);
+            return Result.Failure<bool>(TransactionUnAuthorizedError.Create());
 
         var result = await transactionRepository.Delete(command.id, userId.Value);
 
         await unitOfWork.SaveChangesAsync();
 
-        return result is not null ? true : Result.Failure<bool>(TransactionErrors.NotFound);
+        return result is not null ? true : Result.Failure<bool>(TransactionNotFoundError.Create());
     }
 }

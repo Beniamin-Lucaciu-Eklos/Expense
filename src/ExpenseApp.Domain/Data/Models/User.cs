@@ -14,7 +14,9 @@ public class User : BaseEntity
 
     public void SetJwtToken(string jwtToken) => Token = jwtToken;
 
-    public static User Create(string email, string password)
+    public static User Create(
+        string email,
+        string password)
     {
         var user = new User()
         {

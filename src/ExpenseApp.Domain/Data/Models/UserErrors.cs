@@ -3,21 +3,22 @@ using ExpenseApp.Domain.Abstractions;
 
 namespace ExpenseApp.Domain.Data.Models;
 
-public static class UserErrors
+public sealed record UserNotFoundError() : Error("UserNotFound",
+"The user not found", ErrorType.NotFound)
 {
-  public static class Codes
-  {
-    public const string NotFound = "UserErrors.NotFound";
-    public const string EmailAlreadyExists = "UserErrors.EmailAlreadyExists";
-    public const string InvalidCredentials = "UserErrors.InvalidCredentials";
-  }
+  public static UserNotFoundError Create() => new UserNotFoundError();
+}
 
-  public static Error NotFound = new(Codes.NotFound,
-"The user not found");
+public sealed record UserEmailAlreadyExistsError() 
+: Error("UserEmailAlreadyExists",
+"The user with email already exists", ErrorType.Conflict)
+{
+  public static UserEmailAlreadyExistsError Create() => new UserEmailAlreadyExistsError();
+}
 
-  public static Error EmailAlreadyExists = new(Codes.EmailAlreadyExists,
-"The user with email already exists");
-
-  public static Error InvalidCredentials = new(Codes.InvalidCredentials,
-"This user has invalid credentials");
+public sealed record UserInvalidCredentialsError() 
+: Error("UserInvalidCredentialsError",
+"This user has invalid credentials", ErrorType.Unauthorized)
+{
+  public static UserInvalidCredentialsError Create() => new UserInvalidCredentialsError();
 }

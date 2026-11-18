@@ -12,7 +12,7 @@ internal sealed class CreateTransactionCommandHandler(ITransactionRepository tra
     {
         var userId = userService.GetUserIdFromNameIdentifiedClaim();
         if(userId.IsFailure)
-           return Result.Failure<int>(TransactionErrors.UnAuthorized);       
+           return Result.Failure<int>(TransactionUnAuthorizedError.Create());       
 
         var transaction = Transaction.Create(
             command.Type,

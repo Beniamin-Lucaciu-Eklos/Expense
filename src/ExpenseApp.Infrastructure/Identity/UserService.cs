@@ -37,8 +37,9 @@ public sealed class UserService(IUserClaimPrincipal userClaimPrincipal) : IUserS
 
     public Result<int> GetUserIdFromNameIdentifiedClaim()
     {
-       string? nameIdentifierValue = userClaimPrincipal.GetNameIdentifiedValue();
+        string? nameIdentifierValue = userClaimPrincipal.GetNameIdentifiedValue();
 
-       return int.TryParse(nameIdentifierValue, out int userId) ? Result.Success(userId) : Result.Failure<int>(Error.NullValue);
+        return int.TryParse(nameIdentifierValue, out int userId) ? Result.Success(userId)
+            : Result.Failure<int>(ErrorNullValue.Create());
     }
 }
