@@ -10,7 +10,7 @@ internal sealed class CreateTransactionCommandHandler(ITransactionRepository tra
 {
     public async Task<Result<int>> Handle(CreateTransactionCommand command, CancellationToken cancellationToken)
     {
-        var userId = userService.GetUserIdFromNameIdentifiedClaim();
+        var userId = userService.GetUserIdFromNameIdentifierClaim();
         if(userId.IsFailure)
            return Result.Failure<int>(TransactionUnAuthorizedError.Create());       
 

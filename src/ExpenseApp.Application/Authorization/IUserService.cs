@@ -8,5 +8,5 @@ public interface IUserService
 {
     string GenerateJwtToken(User user);
 
-    Result<int> GetUserIdFromNameIdentifiedClaim();
+    Result<int> GetUserIdFromNameIdentifierClaim();
 }

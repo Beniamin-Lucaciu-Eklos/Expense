@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { MonthlySummary, TransactionTotals } from '../models/monthly-summary';
+import { PagedTransactions } from '../models/paged-transactions';
 import { Transaction } from '../models/transaction';
 
 @Injectable({
@@ -8,11 +10,27 @@ import { Transaction } from '../models/transaction';
 })
 export class TransactionService {
 
-  private apiUrl = 'http://localhost:5136/api';
+  private readonly apiUrl = 'http://localhost:5136/api';
   private http = inject(HttpClient);
 
-  getAll(): Observable<Transaction[]> {
+  getTransactions(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(this.apiUrl + '/transactions');
+  }
+
+  getTransactionsPage(page: number, pageSize: number): Observable<PagedTransactions> {
+    return this.http.get<PagedTransactions>(this.apiUrl + '/transactions/paged', {
+      params: { page, pageSize },
+    });
+  }
+
+  getMonthlySummary(year: number, month: number): Observable<MonthlySummary> {
+    return this.http.get<MonthlySummary>(this.apiUrl + '/transactions/summary', {
+      params: { year, month },
+    });
+  }
+
+  getTransactionTotals(): Observable<TransactionTotals> {
+    return this.http.get<TransactionTotals>(this.apiUrl + '/transactions/summary/all-time');
   }
 
   getById(id: number): Observable<Transaction> {

@@ -35,9 +35,9 @@ public sealed class UserService(IUserClaimPrincipal userClaimPrincipal) : IUserS
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public Result<int> GetUserIdFromNameIdentifiedClaim()
+    public Result<int> GetUserIdFromNameIdentifierClaim()
     {
-        string? nameIdentifierValue = userClaimPrincipal.GetNameIdentifiedValue();
+        string? nameIdentifierValue = userClaimPrincipal.GetNameIdentifierValue();
 
         return int.TryParse(nameIdentifierValue, out int userId) ? Result.Success(userId)
             : Result.Failure<int>(ErrorNullValue.Create());

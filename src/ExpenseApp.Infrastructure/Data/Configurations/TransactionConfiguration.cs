@@ -24,7 +24,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
                      .IsRequired();
 
               builder.Property(transaction => transaction.Amount)
-                     .HasPrecision(18, 2);
+                     .HasColumnType("float");
 
               builder.Property(transaction => transaction.Category)
                      .HasMaxLength(350)
@@ -41,5 +41,15 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
               builder.HasIndex(transaction => transaction.Amount);
               builder.HasIndex(transaction => transaction.Category);
               builder.HasIndex(transaction => transaction.Description);
+              builder.HasIndex(transaction => new
+              {
+                     transaction.UserId,
+                     transaction.CreatedAt,
+                     transaction.Id
+              }).IncludeProperties(transaction => new
+              {
+                     transaction.Amount,
+                     transaction.Type
+              });
        }
 }

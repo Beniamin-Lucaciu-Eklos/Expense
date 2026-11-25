@@ -21,6 +21,7 @@ public static class DependencyInjection
 
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<DevelopmentSampleDataSeeder>();
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ExpenseDbContext>());
 

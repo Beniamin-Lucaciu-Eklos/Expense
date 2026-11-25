@@ -13,6 +13,69 @@ public class TransactionRepository(ExpenseDbContext dbContext) : ITransactionRep
                 .AsNoTracking().ToListAsync();
     }
 
+    public async Task<TransactionPage> GetPageAsync(
+        int userId,
+        int skip,
+        int take,
+        CancellationToken cancellationToken)
+    {
+        var userTransactions = dbContext.Transactions
+            .AsNoTracking()
+            .Where(transaction => transaction.UserId == userId);
+        var totalCount = await userTransactions.CountAsync(cancellationToken);
+        var transactions = await userTransactions
+            .OrderByDescending(transaction => transaction.CreatedAt)
+            .ThenByDescending(transaction => transaction.Id)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync(cancellationToken);
+
+        return new TransactionPage(transactions, totalCount);
+    }
+
+    public async Task<TransactionTotals> GetMonthlyTotalsAsync(
+        int userId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken)
+    {
+        var totals = await dbContext.Transactions
+            .AsNoTracking()
+            .Where(transaction =>
+                transaction.UserId == userId &&
+                transaction.CreatedAt >= startDate &&
+                transaction.CreatedAt < endDate)
+            .GroupBy(_ => 1)
+            .Select(group => new TransactionTotals(
+                group.Sum(transaction =>
+                    transaction.Type == TransactionType.Income ? transaction.Amount : 0d),
+                group.Sum(transaction =>
+                    transaction.Type == TransactionType.Expense ? transaction.Amount : 0d),
+                group.Count()))
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return totals ?? TransactionTotals.Empty;
+    }
+
+    public async Task<TransactionTotals> GetTotalsAsync(
+        int userId,
+        CancellationToken cancellationToken)
+    {
+        var totals = await dbContext.Transactions
+            .AsNoTracking()
+            .Where(transaction => transaction.UserId == userId)
+            .GroupBy(_ => 1)
+            .Select(group => new TransactionTotals(
+                group.Sum(transaction =>
+                    transaction.Type == TransactionType.Income ? transaction.Amount : 0d),
+                group.Sum(transaction =>
+                    transaction.Type == TransactionType.Expense ? transaction.Amount : 0d),
+                group.Count()))
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return totals ?? TransactionTotals.Empty;
+    }
+
     public async Task<Transaction?> GetByIdAsync(int id, int userId)
     {
         return await dbContext.Transactions.FindAsync(id, userId);

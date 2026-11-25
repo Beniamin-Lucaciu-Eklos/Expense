@@ -1,11 +1,10 @@
 using System;
-using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 using ExpenseApp.Application.Dtos;
 using ExpenseApp.Application.Transactions.CreateTransaction;
 using ExpenseApp.Application.Transactions.DeleteTransaction;
 using ExpenseApp.Application.Transactions.TransactionQueries;
 using ExpenseApp.Application.Transactions.UpdateTransaction;
-using ExpenseApp.Domain.Data.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +15,57 @@ namespace ExpenseApp.Api.Controllers;
 public class TransactionsController(ISender sender) : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetAllTransactions()
+    public async Task<IActionResult> GetTransactions()
     {
         var result = await sender.Send(new GetAllTransactionsQuery());
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetTransactionsPage(
+        CancellationToken cancellationToken,
+        [FromQuery, Range(1, 1_000_000)] int page = 1,
+        [FromQuery, Range(1, 100)] int pageSize = 50)
+    {
+        var result = await sender.Send(
+            new GetTransactionsPageQuery(page, pageSize),
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleError(result.Error);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetMonthlySummary(
+        [FromQuery, Range(1, 12)] int month,
+        [FromQuery, Range(1900, 9999)] int year,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(
+            new GetMonthlyTransactionSummaryQuery(year, month),
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleError(result.Error);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet("summary/all-time")]
+    public async Task<IActionResult> GetTransactionTotals(CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new GetTransactionTotalsQuery(), cancellationToken);
+        if (result.IsFailure)
+        {
+            return HandleError(result.Error);
+        }
 
         return Ok(result.Value);
     }
@@ -57,7 +104,7 @@ public class TransactionsController(ISender sender) : BaseApiController
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteTransaction(int id)
     {
         var result = await sender.Send(new DeleteTransactionCommand(id));
 
@@ -70,7 +117,7 @@ public class TransactionsController(ISender sender) : BaseApiController
     }
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] TransactionDto transactionDto)
+    public async Task<IActionResult> UpdateTransaction(int id, [FromBody] TransactionDto transactionDto)
     {
         var result = await sender.Send(new UpdateTransactionCommand(id, transactionDto));
 

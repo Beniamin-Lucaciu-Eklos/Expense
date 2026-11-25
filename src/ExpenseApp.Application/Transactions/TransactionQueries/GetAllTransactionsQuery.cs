@@ -13,7 +13,7 @@ internal sealed class GetAllTransactionsQueryHandler(ITransactionRepository tran
 {
     public async Task<Result<IReadOnlyList<TransactionResponse>>> Handle(GetAllTransactionsQuery query, CancellationToken cancellationToken)
     {
-        var userId = userService.GetUserIdFromNameIdentifiedClaim();
+        var userId = userService.GetUserIdFromNameIdentifierClaim();
         if (userId.IsFailure)
             return Result.Failure<IReadOnlyList<TransactionResponse>>(TransactionUnAuthorizedError.Create());
 

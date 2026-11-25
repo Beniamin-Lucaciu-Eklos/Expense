@@ -1,38 +1,97 @@
 <div class="container-fluid px-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h3 class="mb-0">Monthly summary</h3>
+        <label class="d-flex align-items-center gap-2">
+            <span>Month</span>
+            <input class="form-control" type="month" [value]="selectedMonth()" (change)="onMonthChange($event)">
+        </label>
+    </div>
+    @if (summaryError()) {
+    <div class="alert alert-danger" role="alert">{{summaryError()}}</div>
+    } @else if (isSummaryLoading()) {
+    <p role="status">Loading monthly summary...</p>
+    } @else if (monthlySummary(); as summary) {
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="card h-100 bg-success bg-opacity-75 text-white"
-                [ngClass]="getTotalIncome() >= 0 ? 'bg-success': 'bg-danger'">
+            <div class="card h-100 bg-success bg-opacity-75 text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Total income</h5>
-                    <h3 class="card-text fw-bold">{{getTotalIncome() | currency}}</h3>
+                    <h5 class="card-title">Income</h5>
+                    <h3 class="card-text fw-bold">{{summary.totalIncome | currency}}</h3>
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
-            <div class="card h-100 bg-danger bg-opacity-75 text-white"
-                [ngClass]="getTotalExpense() >= 0 ? 'bg-success': 'bg-danger'">
+            <div class="card h-100 bg-danger bg-opacity-75 text-white">
                 <div class="card-body">
-                    <h5 class="card-title">Total expenses</h5>
-                    <h3 class="card-text fw-bold">{{getTotalExpense() | currency}}</h3>
+                    <h5 class="card-title">Expenses</h5>
+                    <h3 class="card-text fw-bold">{{summary.totalExpenses | currency}}</h3>
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
-            <div class="card h-100 bg-danger bg-opacity-75 text-white"
-                [ngClass]="getNetBalance() >= 0 ? 'bg-success': 'bg-danger'">
+            <div class="card h-100 text-white"
+                [ngClass]="summary.netBalance >= 0 ? 'bg-success' : 'bg-danger'">
                 <div class="card-body">
                     <h5 class="card-title">Net balance</h5>
-                    <h3 class="card-text fw-bold">{{getNetBalance() | currency}}</h3>
+                    <h3 class="card-text fw-bold">{{summary.netBalance | currency}}</h3>
+                    <p class="card-text mb-0">{{summary.transactionCount}} transactions</p>
                 </div>
             </div>
         </div>
     </div>
+    }
+
+    @if (totalsError()) {
+    <div class="alert alert-danger" role="alert">{{totalsError()}}</div>
+    } @else if (isTotalsLoading()) {
+    <p role="status">Loading totals...</p>
+    } @else if (allTimeSummary(); as totals) {
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 bg-success bg-opacity-75 text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total income</h5>
+                    <h3 class="card-text fw-bold">{{totals.totalIncome | currency}}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 bg-danger bg-opacity-75 text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total expenses</h5>
+                    <h3 class="card-text fw-bold">{{totals.totalExpenses | currency}}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 text-white" [ngClass]="totals.netBalance >= 0 ? 'bg-success': 'bg-danger'">
+                <div class="card-body">
+                    <h5 class="card-title">Net balance</h5>
+                    <h3 class="card-text fw-bold">{{totals.netBalance | currency}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
 
     <h3>Transactions</h3>
-    <div class="table-responsive">
+    @if (transactionsError()) {
+    <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+        <span>{{transactionsError()}}</span>
+        <button class="btn btn-sm btn-outline-danger" (click)="loadTransactions()">Retry</button>
+    </div>
+    }
+    <div class="position-relative" [attr.aria-busy]="isTransactionsLoading()">
+        @if (isTransactionsLoading()) {
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-body bg-opacity-75"
+            style="z-index: 1;" role="status">
+            <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            Loading transactions...
+        </div>
+        }
+        <div class="table-responsive">
         <table class="table table-hover align-middle">
             <thead class="table-light">
                 <tr>
@@ -44,7 +103,7 @@
                 </tr>
             </thead>
             <tbody>
-                @for (transaction of transactions(); track $index) {
+                @for (transaction of transactions(); track transaction.id) {
                 <tr>
                     <td>{{transaction.createdAt | date:'dd.MM.yyyy'}}</td>
                     <td [ngClass]="transaction.type === 'Income' ? 'text-success': 'text-danger'">{{transaction.type}}
@@ -95,8 +154,34 @@
                         </div>
                     </td>
                 </tr>
+                } @empty {
+                @if (!isTransactionsLoading() && !transactionsError()) {
+                <tr>
+                    <td colspan="5" class="text-center text-body-secondary py-4">
+                        No transactions found.
+                    </td>
+                </tr>
+                }
                 }
             </tbody>
         </table>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+        <span>
+            Showing {{firstTransactionNumber()}}–{{lastTransactionNumber()}} of {{totalCount()}} transactions
+        </span>
+        <nav class="d-flex align-items-center gap-2" aria-label="Transaction pages">
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToPreviousPage()"
+                [disabled]="isTransactionsLoading() || currentPage() <= 1">
+                Previous
+            </button>
+            <span>Page {{currentPage()}} of {{totalPages()}}</span>
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToNextPage()"
+                [disabled]="isTransactionsLoading() || currentPage() >= totalPages()">
+                Next
+            </button>
+        </nav>
     </div>
 </div>

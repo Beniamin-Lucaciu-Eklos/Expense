@@ -6,16 +6,23 @@ using ExpenseApp.Application.Authorization;
 using ExpenseApp.Infrastructure;
 using ExpenseApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ExpenseApp.Domain.Data.Models;
 using Serilog;
 
 namespace ExpenseApp.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var builderArgs = args
+            .Where(argument =>
+                !string.Equals(argument, "--seed-sample-data", StringComparison.OrdinalIgnoreCase) &&
+                !argument.StartsWith("--seed-count=", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+        var builder = WebApplication.CreateBuilder(builderArgs);
 
         // Add services to the container.
 
@@ -51,6 +58,21 @@ public class Program
 
         var app = builder.Build();
 
+        if (args.Contains("--seed-sample-data", StringComparer.OrdinalIgnoreCase))
+        {
+            if (!app.Environment.IsDevelopment())
+            {
+                throw new InvalidOperationException(
+                    "Sample data can only be seeded when the API is running in Development.");
+            }
+
+            var recordCount = ReadSeedRecordCount(args);
+            await using var scope = app.Services.CreateAsyncScope();
+            var seeder = scope.ServiceProvider.GetRequiredService<DevelopmentSampleDataSeeder>();
+            await seeder.SeedAsync(recordCount);
+            return;
+        }
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -72,5 +94,26 @@ public class Program
         app.MapControllers();
 
         app.Run();
+    }
+
+    private static int ReadSeedRecordCount(string[] args)
+    {
+        const string optionPrefix = "--seed-count=";
+        var countOption = args.FirstOrDefault(argument =>
+            argument.StartsWith(optionPrefix, StringComparison.OrdinalIgnoreCase));
+
+        if (countOption is null)
+        {
+            return 1_000;
+        }
+
+        if (!int.TryParse(countOption[optionPrefix.Length..], out var recordCount) ||
+            recordCount is < 1 or > 1_000_000)
+        {
+            throw new ArgumentException(
+                "The --seed-count value must be between 1 and 1,000,000.");
+        }
+
+        return recordCount;
     }
 }

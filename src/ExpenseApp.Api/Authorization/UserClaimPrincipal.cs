@@ -16,5 +16,5 @@ public class UserClaimPrincipal : IUserClaimPrincipal
     private ClaimsPrincipal User => _accessor.HttpContext?.User
        ?? new ClaimsPrincipal(new ClaimsIdentity());
 
-    public string? GetNameIdentifiedValue() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+    public string? GetNameIdentifierValue() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 }

@@ -34,8 +34,7 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("float(18)");
+                        .HasColumnType("float");
 
                     b.Property<string>("Category")
                         .IsRequired()
@@ -65,7 +64,9 @@ namespace ExpenseApp.Infrastructure.Data.Migrations
 
                     b.HasIndex("Description");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "CreatedAt", "Id");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("UserId", "CreatedAt", "Id"), new[] { "Amount", "Type" });
 
                     b.ToTable("transactions", (string)null);
                 });

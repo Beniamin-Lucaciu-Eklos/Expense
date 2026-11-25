@@ -4,5 +4,5 @@ namespace ExpenseApp.Application.Authorization;
 
 public interface IUserClaimPrincipal
 {
-    string? GetNameIdentifiedValue();
+    string? GetNameIdentifierValue();
 }

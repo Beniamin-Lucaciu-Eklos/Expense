@@ -12,7 +12,7 @@ public sealed class DeleteTransactionHandler(ITransactionRepository transactionR
 {
     public async Task<Result<bool>> Handle(DeleteTransactionCommand command, CancellationToken cancellationToken)
     {
-        var userId = userService.GetUserIdFromNameIdentifiedClaim();
+        var userId = userService.GetUserIdFromNameIdentifierClaim();
         if (userId.IsFailure)
             return Result.Failure<bool>(TransactionUnAuthorizedError.Create());
 

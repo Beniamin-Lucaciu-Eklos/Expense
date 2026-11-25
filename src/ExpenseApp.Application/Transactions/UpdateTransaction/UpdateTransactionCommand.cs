@@ -12,7 +12,7 @@ internal sealed class UpdateTransactionCommandHandler(ITransactionRepository tra
 {
     public async Task<Result<int>> Handle(UpdateTransactionCommand command, CancellationToken cancellationToken)
     {
-        var userId = userService.GetUserIdFromNameIdentifiedClaim();
+        var userId = userService.GetUserIdFromNameIdentifierClaim();
         if (userId.IsFailure)
             return Result.Failure<int>(TransactionUnAuthorizedError.Create());
 
